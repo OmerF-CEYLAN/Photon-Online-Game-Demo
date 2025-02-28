@@ -2,10 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using TMPro;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
-    
+    [SerializeField] 
+    TMP_InputField roomNameInputField;
+
+    [SerializeField]
+    TMP_Text errorText;
+
+    [SerializeField]
+    TMP_Text roomNameText;
+
     void Start()
     {
         Debug.Log("Connecting to master");
@@ -21,11 +30,39 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined lobby");
+        MenuManager.Instance.OpenMenu("title");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void CreateRoom()
     {
-        
+        if (string.IsNullOrEmpty(roomNameInputField.text))
+        {
+            return;
+        }
+        PhotonNetwork.CreateRoom(roomNameInputField.text);
+        MenuManager.Instance.OpenMenu("loading");
+    }
+
+    public override void OnJoinedRoom() // Oda oluþturduðumuzda ya da odaya katýldýðýmýzda çalýþýr.
+    {
+        MenuManager.Instance.OpenMenu("room menu");
+        roomNameText.text = PhotonNetwork.CurrentRoom.Name; //Ýçinde bulunduðumuz odanýn ismi
+    }
+
+    public override void OnCreateRoomFailed(short returnCode,string message)
+    {
+        errorText.text = "Room Creation Failed " + message;
+        MenuManager.Instance.OpenMenu("error");
+    }
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+        MenuManager.Instance.OpenMenu("loading");
+    }
+
+    public override void OnLeftRoom()
+    {
+        MenuManager.Instance.OpenMenu("title");
     }
 }
