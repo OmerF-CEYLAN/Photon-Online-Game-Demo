@@ -10,6 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c96758325668284d9882a6b491014a0, type: 3}
-  m_Name: Gun1
+  m_Name: Pistol
   m_EditorClassIdentifier: 
-  name: Gun 1
+  itemName: Pistol
+  damage: 25
