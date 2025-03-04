@@ -11,6 +11,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     float mouseSensitivity, sprintSpeed, walkSpeed, jumpForce, smoothTime;
 
+    [SerializeField]
+    Item[] items;
+
+    int itemIndex;
+    int previousItemIndex = -1;
+
     float verticalLookRotation;
     bool grounded;
     Vector3 smoothMoveVelocity;
@@ -20,6 +26,8 @@ public class PlayerController : MonoBehaviour
 
     PhotonView PV;
 
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody> ();
@@ -28,7 +36,11 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
-        if(!PV.IsMine)
+        if(PV.IsMine)
+        {
+            EquipItem(0);
+        }
+        else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
             Destroy(rb);
@@ -43,6 +55,15 @@ public class PlayerController : MonoBehaviour
         Look();
         Move();
         Jump();
+
+        for(int i = 0; i < items.Length; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
     }
 
     void Look()
@@ -68,6 +89,23 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(transform.up * jumpForce);
         }
+    }
+
+    void EquipItem(int _index)
+    {
+        if (_index == previousItemIndex)
+            return;
+
+        itemIndex = _index;
+
+        items[itemIndex].itemGameObject.SetActive(true);
+
+        if(previousItemIndex != -1)
+        {
+            items[previousItemIndex].itemGameObject.SetActive(false);
+        }
+
+        previousItemIndex = itemIndex;
     }
 
     public void SetGroundedState(bool _grounded)
